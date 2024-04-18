@@ -68,6 +68,7 @@ export const encryptFile = (filePath: string, password: string, iterations: numb
 		encryptedData: cipherText.toString('hex')
 	};
 
+	filePath = filePath.substring(filePath.lastIndexOf('/')+1);
 	const writeStream = fs.createWriteStream(`${filePath}.enc.json`);
 	writeStream.write(JSON.stringify(fileData));
 	console.timeEnd("Encryption Time");
