@@ -1,7 +1,7 @@
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import { EncryptedFile } from './Types';
-import { generateKeys } from './utils';
+import { generateKeys, parseArgs } from './utils';
 
 /**
  * function to decrypt given file - file must be in the format of an EncryptedFile
@@ -41,6 +41,9 @@ const decryptFile = (filePath: string, password: string): void => {
 		decipher = crypto.createDecipheriv(metadata.encryptionAlgorithm, Ke, Buffer.from(iv, 'hex'));
 	}
 
+	// pads the data to the correct block size
+	decipher.setAutoPadding(true);
+
 	// decrypt the file data
 	let decryptedData = decipher.update(Buffer.from(encryptedData, 'hex'));
 	decryptedData = Buffer.concat([decryptedData, decipher.final()]);
@@ -68,22 +71,10 @@ const validateOptions = (options: Record<string, string>): void => {
 	}
 }
 
-/**
- * function to parse command line arguments
- * @param args - command line arguments
- */
-const parseArgs = (args: string[]): Record<string, string> => {
-	const options: Record<string, string> = {};
-	for (let i = 2; i < args.length; i += 2) {
-			const key = args[i].replace('--', '');
-			options[key] = args[i + 1];
-	}
-	validateOptions(options);
-	return options;
-}
+
 
 	// Parse command line arguments
-const args = parseArgs(process.argv);
+const args = parseArgs(process.argv, validateOptions);
 const { password, filePath} = args;
 
 decryptFile(filePath, password);

@@ -1,4 +1,8 @@
 {
+	"scripts": {
+		"encrypt": "ts-node ./encrypt.ts",
+		"decrypt": "ts-node decrypt.ts"
+	},
   "devDependencies": {
     "@types/node": "^20.12.7",
     "ts-node": "^10.9.2",

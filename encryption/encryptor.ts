@@ -1,7 +1,7 @@
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import { Metadata, EncryptedFile } from './Types';
-import { generateKeys } from './utils';
+import { generateKeys, parseArgs } from './utils';
 
 /**
  * function to encrypt given file
@@ -12,6 +12,7 @@ import { generateKeys } from './utils';
  * @param hashingAlgorithm - algorithm to use for hashing the password (sha256, sha512)
  */
 export const encryptFile = (filePath: string, password: string, iterations: number, encryptionAlgorithm: string, hashingAlgorithm: string): void => {
+	console.time("Encryption Time");
 	// generate a random salt of 16 bytes
 	const salt: Buffer = crypto.randomBytes(16);
 
@@ -45,6 +46,9 @@ export const encryptFile = (filePath: string, password: string, iterations: numb
 		cipher = crypto.createCipheriv(encryptionAlgorithm, Ke, iv);
 	}
 
+	// pads the data to the correct block size
+	cipher.setAutoPadding(true);
+
 	// read the file to be encrypted
 	const data = fs.readFileSync(filePath);
 	// encrypt the file data
@@ -66,6 +70,7 @@ export const encryptFile = (filePath: string, password: string, iterations: numb
 
 	const writeStream = fs.createWriteStream(`${filePath}.enc.json`);
 	writeStream.write(JSON.stringify(fileData));
+	console.timeEnd("Encryption Time");
 }
 
 /**
@@ -98,22 +103,8 @@ const validateOptions = (options: Record<string, string>): void => {
 	}
 }
 
-/**
- * function to parse command line arguments
- * @param args - command line arguments
- */
-const parseArgs = (args: string[]): Record<string, string> => {
-	const options: Record<string, string> = {};
-	for (let i = 2; i < args.length; i += 2) {
-			const key = args[i].replace('--', '');
-			options[key] = args[i + 1];
-	}
-	validateOptions(options);
-	return options;
-}
 
-
-const args = parseArgs(process.argv);
+const args = parseArgs(process.argv, validateOptions);
 // destructure the arguments
 const { encryptionAlgorithm, hashingAlgorithm, iterations, password, filePath} = args;
 
