@@ -10,6 +10,7 @@ The assignment has been written in TypeScript. To run the code, please follow th
   `ts-node encryptor.ts --filePath ./test.txt --password [password] --encryptionAlgorithm aes-256-cbc --hashingAlgorithm sha512 --iterations 10000`
 4. For decrypting a file, run `decryptor.ts` i.e., the decryption utility. Sample command is provided below:
   `ts-node decryptor.ts --filePath ./test.txt --password [password]`
+5. Any missing parameter will cause the program to throw an exception.
 
 ## Overview
 
@@ -22,6 +23,8 @@ In this section, I will provide a brief overview of the project structure and de
 3. PKCS7 padding is automatically handled by the native Node.js [`crypto` library](https://nodejs.org/api/crypto.html#ciphersetautopaddingautopadding) hence the method `cipher.setAutoPadding(true);` is enough to handle padding if input that is not a multiple of the block size for the selected encryption algorithm.
 
 4. `utils.ts` and `Types.ts` files contain helpers for both utilities, with `utils.ts` containing common functions such as key generator and command argument parser while `Types.ts` contains custom types defined for metadata and the structure for the final encrypted file.
+
+5. Any attempt to tamper with the metadata or encrypted file or providing the incorrect password causes the HMAC check in the decryption utility to fail and the program terminates execution.
 
 ## Iteration Count
 
